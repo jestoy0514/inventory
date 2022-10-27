@@ -219,6 +219,7 @@ class MainWindow(ttk.Frame):
         
         self.print_btn = ttk.Button(self.right_frame, text='Print')
         self.print_btn.pack(side=tk.LEFT, padx=3, pady=3)
+        self.print_btn.config(command=self.print_location)
 
         sum_frame = ttk.LabelFrame(graph_frame, text='Summary:')
         sum_frame.pack(side=tk.LEFT, padx=5, pady=5)
@@ -238,6 +239,28 @@ class MainWindow(ttk.Frame):
         close_btn = ttk.Button(self, text='Close', image=self.img16_list['cancel'], compound=tk.LEFT)
         close_btn.pack(side=tk.RIGHT, padx=5, pady=5)
         close_btn.config(command=self.close_app)
+        
+    def print_location(self):
+        line = self.prod_view.focus()
+        if line == '':
+            return
+        item = self.prod_view.item(line)['values']
+        children = self.loca_view.get_children()
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font('Times', '', 12)
+        pdf.cell(100, 10, f'{item[0]} {item[1]} {item[2]} {item[4]}', 0, 1, 'L')
+        if len(children) != 0:
+            for idx in children:
+                values = self.loca_view.item(idx)['values']
+                pdf.cell(15, 10, f"{str(values[0])} --> {str(values[1])}", 0, 1, 'L')
+        pdf.output('location.pdf', 'F')
+        if os.name == 'nt':
+            CREATE_NO_WINDOW = 0x08000000
+            subprocess.call(["start", 'location.pdf'], creationflags=CREATE_NO_WINDOW, shell=True)
+        else:
+            os.system("xdg-open %s"% ('location.pdf',))
+        
 
     def show_sticker(self):
         loc_name = sd.askstring("Location", "Please enter location:", parent=self)
