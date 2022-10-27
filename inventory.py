@@ -216,6 +216,9 @@ class MainWindow(ttk.Frame):
 
         self.loca_view.tag_configure("odd", background="#d5f4e6")
         self.loca_view.tag_configure("even", background="#80ced6")
+        
+        self.print_btn = ttk.Button(self.right_frame, text='Print')
+        self.print_btn.pack(side=tk.LEFT, padx=3, pady=3)
 
         sum_frame = ttk.LabelFrame(graph_frame, text='Summary:')
         sum_frame.pack(side=tk.LEFT, padx=5, pady=5)
@@ -238,19 +241,16 @@ class MainWindow(ttk.Frame):
 
     def show_sticker(self):
         loc_name = sd.askstring("Location", "Please enter location:", parent=self)
-        print(loc_name)
         if loc_name == None:
-            print('Did not entered any location')
             return
         session = DBSession()
         loc_record = session.query(BinLocation).filter(BinLocation.code == loc_name).first()
         if loc_record == None:
-            print('location not available in database.')
+            mb.showerror("Report Error", "Location not available in the database")
             session.close()
             return
         in_records = session.query(Incoming).join(BinLocation).filter(BinLocation.id == loc_record.id).all()
         if len(in_records) == 0:
-            print('No incoming data as per the said location')
             session.close()
             return
         out_records = session.query(Outgoing).join(BinLocation).filter(BinLocation.id == loc_record.id).all()
@@ -300,7 +300,6 @@ class MainWindow(ttk.Frame):
     def show_current_stock(self):
         filename = fd.asksaveasfilename(parent=self, defaultextension='.pdf', initialfile="CurrentStock")
         product = self.incg_dict()
-        #print(product)
         if filename == '':
             return
         pdf = PDF('L')
