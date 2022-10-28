@@ -413,7 +413,6 @@ class MainWindow(ttk.Frame):
     def update_view(self):
         children = self.prod_view.get_children()
         self.prod_view.delete(*children)
-        self.draw_graph()
         product = self.incg_dict()
         counter = 1
         for key,value in product.items():
@@ -426,10 +425,12 @@ class MainWindow(ttk.Frame):
                 else:
                     self.prod_view.insert('', tk.END, str(counter), text=str(counter), values=values, tags='odd')
                 counter += 1
+        self.draw_graph()
 
     def incg_dict(self):
         session = DBSession()
-        records = session.query(Incoming).join(Products).all()
+        records = session.query(Incoming).options(joinedload(Incoming.products)).all()
+        out_recs = session.query(Outgoing).options(joinedload(Outgoing.products)).all()
         product = {}
         for record in records:
             if record.products.code in product.keys():
@@ -438,7 +439,6 @@ class MainWindow(ttk.Frame):
                 data = {'description': record.products.name, 'unit': record.products.units.code,
                         'quantity': record.quantity, 'price': record.products.price}
                 product[record.products.code] = data
-        out_recs = session.query(Outgoing).join(Products).all()
         for out_rec in out_recs:
             if out_rec.products.code in product.keys():
                 product[out_rec.products.code]['quantity'] += out_rec.quantity
