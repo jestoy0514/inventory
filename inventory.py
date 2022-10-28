@@ -1845,23 +1845,23 @@ class IncomingWindow(ttk.Frame):
             return
 
         children = self.incg_view.get_children()
-        if len(children) != 0:
-            for child in children:
-                self.incg_view.delete(child)
+        self.incg_view.delete(*children)
         counter = 1
         for record in records:
+            values = (datetime.strftime(record.in_date, '%d/%m/%Y'),
+                      record.products.code,
+                      record.products.name,
+                      record.products.units.code,
+                      f'{record.products.price:,.2f}',
+                      f'{record.quantity}',
+                      record.binlocation.code,
+                      record.remarks)
             if counter % 2 == 0:
-                self.incg_view.insert('', tk.END, str(record.id), text=str(record.id), tags='odd')
+                self.incg_view.insert('', tk.END, str(record.id),
+                                      text=str(record.id), tags='odd', values=values)
             else:
-                self.incg_view.insert('', tk.END, str(record.id), text=str(record.id), tags='even')
-            self.incg_view.set(str(record.id), 'date', datetime.strftime(record.in_date, '%d/%m/%Y'))
-            self.incg_view.set(str(record.id), 'code', record.products.code)
-            self.incg_view.set(str(record.id), 'name', record.products.name)
-            self.incg_view.set(str(record.id), 'unit', record.products.units.code)
-            self.incg_view.set(str(record.id), 'price', f'{record.products.price:,.2f}')
-            self.incg_view.set(str(record.id), 'quantity', f'{record.quantity}')
-            self.incg_view.set(str(record.id), 'bin', record.binlocation.code)
-            self.incg_view.set(str(record.id), 'remarks', record.remarks)
+                self.incg_view.insert('', tk.END, str(record.id),
+                                      text=str(record.id), tags='even', values=values)
             counter+=1
         session.close()
 
