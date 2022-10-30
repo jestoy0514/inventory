@@ -52,7 +52,7 @@ class MainWindow(ttk.Frame):
     def __init__(self, master=None, *args, **kwargs):
         super(MainWindow, self).__init__(master, *args, **kwargs)
         self.master.geometry('900x600+10+10')
-        self.master.title('Inventory Management '+__version__)
+        self.master.title('Inventory '+__version__)
         self.master.protocol('WM_DELETE_WINDOW', self.close_app)
         self.style = ttk.Style()
         self.img36_list = image_list(size=(36, 36))
@@ -233,7 +233,7 @@ class MainWindow(ttk.Frame):
         self.demo3 = Demo(sum_frame)
         self.demo3.pack(side=tk.LEFT)
 
-        self.title_lbl = tk.Label(graph_frame, text='Inventory\nManagement 1.0', foreground='#6B266B', font='Times 36 bold italic')
+        self.title_lbl = tk.Label(graph_frame, text=f'Inventory {__version__}', foreground='#6B266B', font='Times 36 bold italic')
         self.title_lbl.pack(side=tk.RIGHT, padx=5, pady=5)
 
         close_btn = ttk.Button(self, text='Close', image=self.img16_list['cancel'], compound=tk.LEFT)
@@ -336,7 +336,10 @@ class MainWindow(ttk.Frame):
             if sub_total != 0:
                 pdf.cell(20, 8, f'{counter}', 1, 0, 'C', True)
                 pdf.cell(35, 8, f'{key}', 1, 0, 'C', True)
-                pdf.cell(100, 8, f"{value['description']}", 1, 0, 'C', True)
+                if len(value['description']) > 35:
+                    pdf.cell(100, 8, f"{value['description'][0:35]}", 1, 0, 'C', True)
+                else:
+                    pdf.cell(100, 8, f"{value['description']}", 1, 0, 'C', True)
                 pdf.cell(30, 8, f"{value['unit']}", 1, 0, 'C', True)
                 pdf.cell(30, 8, f"{value['price']:,.2f}", 1, 0, 'C', True)
                 pdf.cell(30, 8, f"{value['quantity']:,.2f}", 1, 0, 'C', True)
@@ -1822,7 +1825,7 @@ class IncomingWindow(ttk.Frame):
         children = self.incg_view.get_children()
         self.incg_view.delete(*children)
         for record in records:
-            values = (record.in_date, record.products.code, record.name,
+            values = (datetime.strftime(record.in_date, "%d/%m/%Y"), record.products.code, record.name,
                     record.products.units.code, record.products.price, record.quantity,
                     record.binlocation.code, record.remarks)
             if counter % 2 == 0:
@@ -2384,7 +2387,7 @@ class AboutWindow(ttk.Frame):
         logo_lbl = tk.Label(top_frame, image=self.img72_list['inventory'])
         logo_lbl.pack(side=tk.LEFT)
 
-        text = " ".join(["Inventory Management", __version__])
+        text = " ".join(["Inventory", __version__])
 
         app_name_lbl = tk.Label(top_frame, text=text,
                                 font="Times 11 bold", fg='#611161')
@@ -2429,8 +2432,8 @@ class AboutWindow(ttk.Frame):
 # Start of PDF class
 class PDF(FPDF):
     def header(self):
-        self.set_font('Times', 'B', 20)
-        self.cell(0, 10, 'Al Hamra Construction Co. LLC', 0, 1, 'C')
+        #self.set_font('Times', 'B', 20)
+        #self.cell(0, 10, 'Al Hamra Construction Co. LLC', 0, 1, 'C')
         self.set_font('Times', 'I', 17)
         self.cell(0, 20, 'Current Stock', 0, 1, 'C')
         # Start of table header

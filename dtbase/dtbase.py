@@ -25,6 +25,7 @@ class Products(Base):
     units_id = Column(Integer, ForeignKey('units.id'))
     units = relationship(Units)
     price = Column(Float)
+    image = Column(String(350), nullable=True)
     
 class Projects(Base):
     __tablename__ = 'projects'
