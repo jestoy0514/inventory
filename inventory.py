@@ -6,6 +6,7 @@ from tkinter import messagebox as mb
 from tkinter import filedialog as fd
 from tkinter.scrolledtext import ScrolledText
 from tkinter import simpledialog as sd
+import tkinter.font as tkFont
 import os
 from fpdf import FPDF
 import sys
@@ -178,15 +179,15 @@ class MainWindow(ttk.Frame):
         for prod_col in prod_cols:
             self.prod_view.heading(prod_col, text=prod_col.replace('_', ' ').title())
             if prod_col == 'price':
-                self.prod_view.column(prod_col, width=50, stretch=False, anchor='e')
+                self.prod_view.column(prod_col, width=70, stretch=False, anchor='e')
             if prod_col == 'unit':
                 self.prod_view.column(prod_col, width=50, stretch=False, anchor='center')
             if prod_col == 'quantity':
                 self.prod_view.column(prod_col, width=75, stretch=False, anchor='center')
             if prod_col == 'item_code':
-                self.prod_view.column(prod_col, width=100, stretch=False)
+                self.prod_view.column(prod_col, width=120, stretch=False)
             if prod_col == 'item_name':
-                self.prod_view.column(prod_col, width=200, stretch=False)
+                self.prod_view.column(prod_col, width=250, stretch=False)
             if prod_col == 'amount':
                 self.prod_view.column(prod_col, anchor='center')
 
@@ -292,6 +293,7 @@ class MainWindow(ttk.Frame):
 
         pdf = FPDF()
         pdf.add_page()
+        pdf.ln(15)
         for k, v in pro_dict.items():
             if (v[2]+v[3]) != 0:
                 print(k, v[0], v[1], v[2]+v[3])
@@ -545,10 +547,10 @@ class MainWindow(ttk.Frame):
         self.search_entry.focus_set()
 
     def load_location(self, event):
-        print(event.type) # Some bug is here.
+        print(event.type) #todo Some bug is here.
         item = self.prod_view.focus()
         if item == '':
-            mb.showwarning('No record', 'No record')
+            return
         else:
             if type(self.prod_view.item(item)['values'][0]) == int:
                 item = "%s" % ("{:010}".format(self.prod_view.item(item)['values'][0]),)
@@ -2459,6 +2461,8 @@ class PDF(FPDF):
 
 def main():
     root = tk.Tk()
+    #defaultFont = tkFont.Font(root=root, name="TkDefaultFont", exists=True)
+    #defaultFont.configure(family='Times', size=11, weight='bold')
     win = MainWindow(root)
     win.pack(expand=True, fill=tk.BOTH, ipadx=5, ipady=5)
     win.update_view()
